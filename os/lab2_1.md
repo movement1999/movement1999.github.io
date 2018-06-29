@@ -3,39 +3,36 @@
 ตัวอย่างโปรแกรม lab2_1.cpp 
 -----
 ```cpp
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include <sys/types.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h> // for exit()
-#include <wait.h>   // for wait()
-
-int main()
-{
-	pid_t  pid;
-
-	pid = fork();  //Fork a child process
-
-        if(pid < 0){ //Fork error
-		fprintf(stderr,"Fork failed.\n");
-                exit(-1);
-        }
-        else if(pid==0){ // This is the path of child process
-            printf("Before replace the child with other code...\n");
-            execlp("/usr/bin/nano","nano",NULL); // call a text editor
-	}
-	else { // This is the path of parent process
-	    printf("Before going into the wait  state...\n");
-	    wait(NULL);
-	    printf("Child process has terminated\n");
-            exit(0);
-        }
-}
-
+  1 #ifdef HAVE_CONFIG_H
+  2 #include <config.h>
+  3 #endif
+  4
+  5 #include <sys/types.h>
+  6 #include <stdio.h>
+  7 #include <unistd.h>
+  8 #include <stdlib.h> // for exit()
+  9 #include <wait.h>   // for wait()
+ 10
+ 11 int main(){
+ 12         pid_t  pid;
+ 13
+ 14         pid = fork();  //Fork a child process
+ 15
+ 16         if(pid < 0){ //Fork error
+ 17                 fprintf(stderr,"Fork failed.\n");
+ 18                 exit(-1);
+ 19         }
+ 20         else if(pid==0){ // This is the path of child process
+ 21             printf("Before replace the child with other code...\n");
+ 22             execlp("/usr/bin/nano","nano",NULL); // call a text editor
+ 23         }
+ 24         else { // This is the path of parent process
+ 25             printf("Before going into the wait  state...\n");
+ 26             wait(NULL);
+ 27             printf("Child process has terminated\n");
+ 28             exit(0);
+ 29         }
+ 30 }
 ```
 โปรแกรมนี้จะสร้าง process ลูกที่เรียกโปรแกรม "nano"[^1] ขี้นมาและ process แม่จะรอจนกว่า
 
@@ -132,11 +129,48 @@ Movement   153   152  0 18:44 tty2     00:00:00 nano
 ----
 ## อธิบาย code
 
-ตัวแปร pid_t ทำหน้าที่เก็บค่าของ PID โดยค่าเริ่มต้นจะเป็น 0
+ตัวแปร pid_t ทำหน้าที่เก็บค่าของ PID 
 ```cpp
 pid_t  pid;
 ```
-ฟั่งชั่น fork()[^2]
+#### fork
+ฟั่งชั่น fork[^2] จะสร้าง process ลูกขึ้นมาแล้วเริ่มทำงานเหมือน code ของ process แม่ แต่จะเริ่มทำงานที่บรรทัดที่มีการเรียกใช้งาน fork()
+ - fork() จะคืนค่า PID ของ process ลูก
+ - fork() จะคืนค่าลบถ้าสร้าง process ลูกไม่สำเสร็จ
+ - fork() process ลูกที่ถูกสร้างที่ขึ้นมาโดย fork จะคืนค่า 0
+
+ ตัวอย่าง fork.cpp
+ ```cpp
+  1 #include<sys/types.h>
+  2 #include<stdio.h>
+  3 #include<unistd.h>
+  4
+  5
+  6 int main()
+  7 {
+  8     pid_t pid;
+  9
+ 10     printf("Before fork()\n");
+ 11     pid=fork();
+ 12     printf("After fork() pid=%d\n",pid);
+ 13
+ 14     return 0;
+ 15
+ 16 }
+ ```
+ ทดลองรัน
+
+```console
+Movement@PC:~/code/c/os$ ./fork
+Befor fork()
+After fork() pid=268
+After fork() pid=0
+Movement@PC:~/code/c/os$
+```
+จะเห็นว่า "Before fork()" ถูกแสดงแค่ครั้งเดียวโดย process แม่ แต่"After fork()" ถูกแสดงถึงสองครั้งโดย process แม่และลูก 
+เพราะว่า process ลูกจะเริ่มทำงานที่บรรทัดที่ fork ถูกเรียกใช้ทำให้ไม่มีการปริ้น "Before fork()" เก็บขึ้น
+"After fork() pid=268" เป็นของ process แม่เก็บค่า PID ของลูกไว้
+"After fork() pid=0" เป็นของ Process ลูก fork จะคืนค่า PID เป็นศูนย์
 
 
 [^1]:Text Editor ใน Linux
