@@ -171,7 +171,7 @@ Movement@PC:~/code/c/os$
 เพราะว่า process ลูกจะเริ่มทำงานที่บรรทัดที่ fork ถูกเรียกใช้ทำให้ไม่มีการปริ้น "Before fork()" เก็บขึ้น
 
 
-"After fork() pid=268" เป็นของ process แม่เก็บค่า PID ของลูกไว้
+"After fork() pid=268" เป็นของ process แม่เก็บค่า PID ของลูกไว้ <br /> 
 "After fork() pid=0" เป็นของ Process ลูก fork จะคืนค่า PID เป็นศูนย์
 
 
